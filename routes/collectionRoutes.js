@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+const ctrl = require('../controllers/collectionController');
+const { protect, admin } = require('../middleware/auth');
+router.get('/', ctrl.getCollections);
+router.get('/slug/:slug', ctrl.getCollectionBySlug);
+router.post('/', protect, admin, ctrl.createCollection);
+router.put('/:id', protect, admin, ctrl.updateCollection);
+router.delete('/:id', protect, admin, ctrl.deleteCollection);
+module.exports = router;
