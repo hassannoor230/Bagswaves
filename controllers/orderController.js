@@ -1,7 +1,7 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Coupon = require('../models/Coupon');
-const { sendOrderConfirmation } = require('../services/emailService');
+const { sendOrderConfirmation, sendAdminOrderNotification } = require('../services/emailService');
 
 const generateOrderNumber = () => 'BW' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
 
@@ -62,6 +62,7 @@ exports.createOrder = async (req, res) => {
     });
 
     try { await sendOrderConfirmation(order, req.user); } catch (e) { console.error(e); }
+    try { await sendAdminOrderNotification(order); } catch (e) { console.error('Admin notification failed', e); }
 
     res.status(201).json({ success: true, order });
   } catch (e) {

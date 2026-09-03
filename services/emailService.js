@@ -83,4 +83,43 @@ const sendOrderConfirmation = async (order, user) => {
   if (email) await sendEmail({ to: email, subject: `Order Confirmed – ${order.orderNumber}`, html });
 };
 
-module.exports = { sendEmail, sendWelcomeEmail, sendOrderConfirmation };
+const sendAdminOrderNotification = async (order) => {
+  const itemsHtml = order.items.map(item => `
+    <tr>
+      <td style="padding: 8px 0;">${item.name} ${item.color ? `(${item.color})` : ''}</td>
+      <td style="padding: 8px 0; text-align: center;">${item.quantity}</td>
+      <td style="padding: 8px 0; text-align: right;">$${item.price.toFixed(2)}</td>
+    </tr>
+  `).join('');
+
+  const html = `
+    <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #2A211C;">
+      <h1 style="font-weight: 300; letter-spacing: 2px;">NEW ORDER RECEIVED</h1>
+      <p>A new order has been placed on BagsWaves.</p>
+      <p><strong>Order Number:</strong> ${order.orderNumber}</p>
+      <p><strong>Customer:</strong> ${order.user ? order.user.firstName + ' ' + order.user.lastName : order.guestEmail || 'Guest'}</p>
+      <p><strong>Email:</strong> ${order.user?.email || order.guestEmail || 'N/A'}</p>
+      <p><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+      <p><strong>Status:</strong> ${order.orderStatus}</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <thead>
+          <tr style="border-bottom: 1px solid #EDE5DA;">
+            <th style="text-align: left; padding: 8px 0;">Item</th>
+            <th style="text-align: center;">Qty</th>
+            <th style="text-align: right;">Price</th>
+          </tr>
+        </thead>
+        <tbody>${itemsHtml}</tbody>
+      </table>
+      <p style="margin-top: 40px;">With elegance,<br>The BagsWaves Team</p>
+    </div>
+  `;
+
+  await sendEmail({
+    to: process.env.ADMIN_EMAIL || 'hassannoor2309@gmail.com',
+    subject: `New Order ${order.orderNumber} – Action Required`,
+    html
+  });
+};
+
+module.exports = { sendEmail, sendWelcomeEmail, sendOrderConfirmation, sendAdminOrderNotification };
