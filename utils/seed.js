@@ -10,6 +10,13 @@ const Coupon = require('../models/Coupon');
 const Review = require('../models/Review');
 
 const slugify = (str) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+const productImages = [
+  'https://astore.pk/cdn/shop/files/Product_2.png?v=1786380081&width=823',
+  'https://astore.pk/cdn/shop/files/1-4_0066799b-1ed4-4f82-8741-1c6b9b9d89f6.png?v=1763469069&width=360',
+  'https://astore.pk/cdn/shop/files/Product3_4.png?v=1786380285&width=360',
+  'https://astore.pk/cdn/shop/files/Product_2.png?v=1786380081&width=823',
+  'https://astore.pk/cdn/shop/files/Product_1_6.png?v=1786379675&width=823',
+];
 
 const seed = async () => {
   await connectDB();
@@ -71,16 +78,16 @@ const seed = async () => {
   ];
 
   const products = [];
-  for (const p of productData) {
+  for (const [productIndex, p] of productData.entries()) {
     const slug = slugify(p.name);
     products.push(await Product.create({
       ...p,
       slug,
       description: `${p.shortDescription} Crafted with exceptional attention to detail, the ${p.name} embodies the BagsWaves philosophy of timeless elegance and refined craftsmanship. Each piece is designed to become a lasting companion.`,
       images: [
-        `https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80`,
-        `https://images.unsplash.com/photo-1590874103328-eac38a6749f9?w=800&q=80`,
-        `https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=800&q=80`
+        productImages[productIndex % productImages.length],
+        productImages[(productIndex + 1) % productImages.length],
+        productImages[(productIndex + 2) % productImages.length]
       ],
       colors: [
         { name: 'Black', hex: '#0B0A09', stock: 12, images: [] },
